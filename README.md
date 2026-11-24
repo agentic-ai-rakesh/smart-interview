@@ -2,6 +2,54 @@
 
 A small interview-practice app with a FastAPI backend and a Streamlit frontend. The backend uses a LangGraph agent with LangChain models (Gemini, GPT and Claude, all through OpenRouter) to generate topic-aware interview questions and suggested answers, and stores results in MongoDB.
 
+## Highlights
+
+- **Every question and answer is stored in MongoDB.** Each generated set, each *Ask a question*
+  answer and each *Quick Topic* box is saved as a document in one collection, so it can be
+  revisited later with **no LLM call** (no wait, no token cost).
+- **Auto model selection.** With *Auto*, the LangGraph agent picks the best-suited model for each
+  request (Gemini Flash-Lite, GPT-4o mini or Claude Sonnet, all through OpenRouter), with a
+  rule-based fallback.
+- **Interview practice tools:** topic, subtopic, level and type selection; checked/unchecked status
+  per question; refine a question or answer in simpler words; per-request and per-step metrics.
+
+## Storage (MongoDB)
+
+All results go to the collection named by `MONGODB_COLLECTION` in the database `MONGODB_DATABASE`
+(defaults in `.env.example`: `interviewdb` / `interview_responses`).
+
+| What is saved | Document | Revisit without an LLM call |
+|---|---|---|
+| Generated interview questions and answers | `topic`, `sub_topics`, `experience_level`, `question_type`, `questions[]` (each with `question_id`, text, answer, `status`), `process_info` | *Own knowledge base* model option, and the paginated question list |
+| *Ask a question* answers | `kind: "user_question"` | *My questions* tab |
+| *Quick Topic* boxes | `kind: "quick_topic"` | *Quick Topic* list |
+
+- **Reuse instead of regenerate:** choose **Own knowledge base** as the model. The API reads saved
+  questions that match the topic, subtopics, level and type, removes duplicate texts, and returns a
+  random set of them. No model is called and nothing is saved again. If there are not enough
+  matches, it says so, and you can generate more with a model.
+- **Updates in place:** *Mark as checked* and *Refine* update the saved document (`status`,
+  `refined_text`, `refined_answer`), so your progress and refined versions are there next time.
+- **Lists are history reads:** the question list, *My questions* and *Quick Topic* lists are paged
+  MongoDB reads (newest first, 5 per page).
+
+## Auto model selection
+
+Models are listed in `data/models.json`, each with a plain-language `description` of what it is
+good at.
+
+1. **You pick a model:** that model is always used.
+2. **Auto (or no model):** the agent sends the request details (topic, subtopics, level, question
+   type, count) and the model descriptions to the agent model, which returns its choice and a
+   short reason. For example, conceptual Beginner questions go to the fast, low-cost Gemini
+   Flash-Lite, and Advanced code or scenario problems go to Claude Sonnet. Only models whose API
+   key is set are offered.
+3. **Fallback:** if that choice fails or is unusable, `data/model_routing.json` maps the question
+   type to a model (General → Gemini, Code and Scenario problems → Claude Sonnet).
+
+*Ask a question* and *Quick Topic* use the same idea on the question text, with the default model as
+the fallback. The chosen model and the reason appear under *Current Metrics* in the app.
+
 ## Project structure
 
 ```text
@@ -195,9 +243,9 @@ the end returns the last page.
   answers. The Streamlit model selector defaults to `knowledge_base`; choose
   `auto` or a configured model to generate new questions. `model` can be
   `auto`, a configured model ID, or `knowledge_base`. When omitted or set to
-  `auto`, the question type is routed according to `data/model_routing.json`.
-  By default, General questions use Gemini Flash-Lite, and Code and Scenario
-  problems use Claude Sonnet. Selecting a specific model overrides automatic
+  `auto`, the agent chooses the model (see *Auto model selection*), falling back
+  to `data/model_routing.json` (General → Gemini Flash-Lite, Code and Scenario
+  problems → Claude Sonnet). Selecting a specific model overrides automatic
   routing. The `knowledge_base` option
   retrieves saved questions matching the selected topic, experience level,
   question type, and subtopics without making an LLM call, selecting a random
