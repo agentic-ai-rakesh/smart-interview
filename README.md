@@ -86,7 +86,7 @@ smart_interview/
 Prerequisites: Python 3.9 or newer, and a running MongoDB server (local or remote).
 
 ```bash
-git clone https://github.com/rakeshrex0505/smart-interview.git
+git clone https://github.com/agentic-ai-rakesh/smart-interview.git
 cd smart-interview
 make install            # or: python -m venv .venv && .venv/bin/pip install -r requirements.txt
 cp -n .env.example .env # then fill in your own values
