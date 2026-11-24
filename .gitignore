@@ -1,0 +1,10 @@
+.env
+.venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.venv.copied-backup/
+.env.*
+!.env.example
+*.log
+.DS_Store
