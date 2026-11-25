@@ -330,9 +330,9 @@ st.markdown(
     div.element-container:has(.q-status-unchecked) + div.element-container .stButton button,
     div.element-container:has(.q-status-checked) + div.element-container .stButton button {
         border-radius: 999px;
-        padding: 0.05rem 0.85rem;
+        padding: 0.1rem 0.9rem;
         min-height: 0;
-        font-size: 0.85rem;
+        font-size: 15px !important;
         font-weight: 600;
     }
     div.element-container:has(.q-status-unchecked) + div.element-container .stButton button {
@@ -412,6 +412,94 @@ st.markdown(
     }
     div.element-container:has(.topic-box-marker) + div.element-container > div {
         width: 100% !important;  /* Streamlit sets a fixed inline width on the markdown */
+    }
+    /* Less empty space at the top: Streamlit adds 6rem above the page and a white header
+       bar. Keep a small gap, make the bar transparent, and let clicks pass through it to
+       the content below (only its menu button stays clickable). */
+    .block-container {
+        padding-top: 1rem !important;
+    }
+    header[data-testid="stHeader"] {
+        background: transparent;
+        pointer-events: none;
+    }
+    header[data-testid="stHeader"] [data-testid="stToolbar"],
+    header[data-testid="stHeader"] [data-testid="stToolbar"] * {
+        pointer-events: auto;
+    }
+    /* Middle panel only (all tabs): larger, darker, easier-to-read text.
+       The left and right panels keep Streamlit's default sizes. */
+    div[data-testid="stHorizontalBlock"] > div[data-testid="column"]:nth-child(2) [data-testid="stMarkdownContainer"] p,
+    div[data-testid="stHorizontalBlock"] > div[data-testid="column"]:nth-child(2) [data-testid="stMarkdownContainer"] li {
+        font-size: 18px;
+        line-height: 1.65;
+        color: #111827;
+    }
+    div[data-testid="stHorizontalBlock"] > div[data-testid="column"]:nth-child(2) [data-testid="stMarkdownContainer"] li {
+        margin-bottom: 0.25rem;
+    }
+    div[data-testid="stHorizontalBlock"] > div[data-testid="column"]:nth-child(2) [data-testid="stMarkdownContainer"] code {
+        font-size: 0.95em;
+    }
+    div[data-testid="stHorizontalBlock"] > div[data-testid="column"]:nth-child(2) [data-testid="stCaptionContainer"],
+    div[data-testid="stHorizontalBlock"] > div[data-testid="column"]:nth-child(2) [data-testid="stCaptionContainer"] p {
+        font-size: 16px !important;
+        color: #374151 !important;
+    }
+    div[data-testid="stHorizontalBlock"] > div[data-testid="column"]:nth-child(2) h3 {
+        font-size: 28px;
+    }
+    div[data-testid="stHorizontalBlock"] > div[data-testid="column"]:nth-child(2) h4 {
+        font-size: 22px;
+    }
+    div[data-testid="stHorizontalBlock"] > div[data-testid="column"]:nth-child(2) [role="tablist"] {
+        flex-wrap: wrap;  /* larger tab labels wrap instead of scrolling out of view */
+        row-gap: 0.25rem;
+    }
+    /* The sliding underline can't follow wrapped tabs, so mark the active tab with a
+       rounded background instead. */
+    div[data-testid="stHorizontalBlock"] > div[data-testid="column"]:nth-child(2) [data-baseweb="tab-highlight"] {
+        display: none;
+    }
+    div[data-testid="stHorizontalBlock"] > div[data-testid="column"]:nth-child(2) button[role="tab"] {
+        border-radius: 8px;
+        padding-left: 0.6rem !important;
+        padding-right: 0.6rem !important;
+    }
+    div[data-testid="stHorizontalBlock"] > div[data-testid="column"]:nth-child(2) button[role="tab"][aria-selected="true"] {
+        background: #FEE2E2;
+        color: #B91C1C;
+    }
+    div[data-testid="stHorizontalBlock"] > div[data-testid="column"]:nth-child(2) .q-title {
+        font-size: 19px;
+    }
+    div[data-testid="stHorizontalBlock"] > div[data-testid="column"]:nth-child(2) button[role="tab"] {
+        font-size: 16px;
+        font-weight: 600;
+        padding-top: 0.5rem;
+        padding-bottom: 0.5rem;
+    }
+    div[data-testid="stHorizontalBlock"] > div[data-testid="column"]:nth-child(2) label,
+    div[data-testid="stHorizontalBlock"] > div[data-testid="column"]:nth-child(2) label p {
+        font-size: 16px !important;
+    }
+    div[data-testid="stHorizontalBlock"] > div[data-testid="column"]:nth-child(2) input,
+    div[data-testid="stHorizontalBlock"] > div[data-testid="column"]:nth-child(2) textarea {
+        font-size: 17px !important;
+    }
+    div[data-testid="stHorizontalBlock"] > div[data-testid="column"]:nth-child(2) .streamlit-expanderHeader,
+    div[data-testid="stHorizontalBlock"] > div[data-testid="column"]:nth-child(2) .streamlit-expanderHeader p {
+        font-size: 17px;
+        font-weight: 600;
+    }
+    div[data-testid="stHorizontalBlock"] > div[data-testid="column"]:nth-child(2) .stButton button,
+    div[data-testid="stHorizontalBlock"] > div[data-testid="column"]:nth-child(2) .stButton button p,
+    div[data-testid="stHorizontalBlock"] > div[data-testid="column"]:nth-child(2) [data-testid="stFormSubmitButton"] button,
+    div[data-testid="stHorizontalBlock"] > div[data-testid="column"]:nth-child(2) [data-testid="stFormSubmitButton"] button p {
+        font-size: 16px;
+    }
+    div[data-testid="stHorizontalBlock"] > div[data-testid="column"]:nth-child(2) .stAlert p {
+        font-size: 17px;
     }
     /* Don't tint a just-clicked button red (clashes with the green "Checked" state). */
     .stButton > button:focus:not(:active) {
